@@ -1,5 +1,5 @@
 from googleplaces import GooglePlaces, types
-from collections import *
+from operator import itemgetter
 
 from nearby import googleMapsApi
 
@@ -43,13 +43,13 @@ def transport(post_code):
 def transport_train(post_code, distance):
     print("Trains ---------------------------------")
 
-    distance_m = distance * 1609.344
+    meters = distance * 1609.344
 
     train_station_list = []
     train_distance_list = []
 
-    query_result = google_places.nearby_search(location=post_code, radius=distance_m, types=[types.TYPE_TRAIN_STATION,
-                                                                                             types.TYPE_SUBWAY_STATION])
+    query_result = google_places.nearby_search(location=post_code, radius=meters, types=[types.TYPE_TRAIN_STATION,
+                                                                                         types.TYPE_SUBWAY_STATION])
 
     for place in query_result.places:
         station_name = place.name
@@ -61,8 +61,9 @@ def transport_train(post_code, distance):
             train_distance_list.append(station_distance)
             print("{0} ({1})".format(station_name, station_distance))
 
-    train_dict = OrderedDict(zip(train_station_list, train_distance_list))
-    return train_dict
+    train_dict = dict(zip(train_station_list, train_distance_list))
+    train_dict_sorted = sorted(train_dict.items(), key=itemgetter(1), reverse=False)
+    return train_dict_sorted
 
 
 def transport_transit(post_code):
@@ -75,6 +76,7 @@ def transport_transit(post_code):
         location = place.geo_location
         transport_distance = googleMapsApi.distance_calc(post_code, location)
         print(transport_distance)
+
 
 def transport_airport(post_code):
     print("Airports -------------------------------")
