@@ -43,21 +43,23 @@ def transport(post_code):
 def transport_train(post_code, distance):
     print("Trains ---------------------------------")
 
-    distance = distance * 1609.34
+    distance_m = distance * 1609.344
 
     train_station_list = []
     train_distance_list = []
 
-    query_result = google_places.nearby_search( location=post_code, radius=distance, types=[types.TYPE_TRAIN_STATION])
+    query_result = google_places.nearby_search(location=post_code, radius=distance_m, types=[types.TYPE_TRAIN_STATION,
+                                                                                             types.TYPE_SUBWAY_STATION])
 
     for place in query_result.places:
         station_name = place.name
         if ("Station" or "station") not in station_name:
             station_name += " Station"
-        train_station_list.append(station_name)
         station_distance = googleMapsApi.distance_calc(post_code, place.geo_location)
-        train_distance_list.append(station_distance)
-        print("{0} ({1})".format(station_name, station_distance))
+        if station_distance <= distance:
+            train_station_list.append(station_name)
+            train_distance_list.append(station_distance)
+            print("{0} ({1})".format(station_name, station_distance))
 
     train_dict = OrderedDict(zip(train_station_list, train_distance_list))
     return train_dict

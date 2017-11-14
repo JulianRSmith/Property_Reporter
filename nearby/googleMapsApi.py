@@ -9,7 +9,7 @@ g_maps = Client(API_KEY)
 def distance_calc(origin, destination):
     data = distance_matrix(g_maps, origin, destination, units="imperial")
     distance = data['rows'][0]['elements'][0]['distance']['text']
-    distance += "les"
+    distance = float(distance[:-3])
     return distance
 
 

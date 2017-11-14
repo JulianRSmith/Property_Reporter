@@ -1,3 +1,8 @@
+# main.py
+# Created by Julian Smith
+# GitHub: Julian R Smith
+# Not for commercial use
+
 from appJar import gui
 
 import pdfBuilder
