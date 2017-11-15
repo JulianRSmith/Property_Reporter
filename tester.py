@@ -100,17 +100,7 @@ def create_transport_data():
     story.append(Spacer(1, 12))
 
     # Generates a table with the data inside it
-    data = [['Station Name', 'Distance']]
-    for item in train_list:
-        data.append([item[0], str(item[1]) + " miles"])
-    t = Table(data)
-    t.setStyle(TableStyle([('BOX', (0, 0), (1, station_count), 1, colors.black),
-                           ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                           ('BACKGROUND', (0, 0), (1, 0), colors.black),
-                           ('TEXTCOLOR', (0, 0), (1, 0), colors.white),
-                           ('BACKGROUND', (0, 1), (1, 1), colors.lightgrey)]))
-    story.append(t)
-    story.append(Spacer(1, 12))
+    create_table("Station Name", train_list)
     # ------------------------------------------------------------------------------------------------------------------
 
     # Airports ---------------------------------------------------------------------------------------------------------
@@ -126,6 +116,9 @@ def create_transport_data():
                                        nearest_airport_dist)
     story.append(Paragraph(p_text, styles["Justify"]))
     story.append(Spacer(1, 12))
+
+    # Generates a table with the data inside it
+    create_table("Airport Name", airport_list)
     # ------------------------------------------------------------------------------------------------------------------
 
 
@@ -137,6 +130,19 @@ def create_title(title_text):
     story.append(d)
     story.append(Spacer(1, 10))
 
+
+def create_table(title, item_list):
+    data = [[title, 'Distance']]
+    for item in item_list:
+        data.append([item[0], str(item[1]) + " miles"])
+    t = Table(data)
+    t.setStyle(TableStyle([('BOX', (0, 0), (1, len(item_list)), 1, colors.black),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                           ('BACKGROUND', (0, 0), (1, 0), colors.black),
+                           ('TEXTCOLOR', (0, 0), (1, 0), colors.white),
+                           ('BACKGROUND', (0, 1), (1, 1), colors.lightgrey)]))
+    story.append(t)
+    story.append(Spacer(1, 12))
 
 def title_client_text(name, item):
     p_text = "<font size=12><b>{0}</b> <i>{1}</i></font>".format(name, item)
