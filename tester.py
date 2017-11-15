@@ -3,6 +3,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 from reportlab.lib import colors, styles as style, enums
 
 from nearby import nearby_data, googleMapsApi
+from web import  web_data
 
 # Global variables
 styles = style.getSampleStyleSheet()
@@ -17,7 +18,8 @@ client_address = "10 Client Street, London, SW1X 5AH"
 client_email = "client@clientproperty.co.uk"
 client_phone = "12345678910"
 site_name = "221 Example House"
-postcode = "HA4 0EJ"
+postcode = "HP6 6SW"
+# HA4 8NN
 site_address = site_name + ", London , " + postcode
 
 # ------------------------------------------------ Date suffix adders --------------------------------------------------
@@ -75,7 +77,7 @@ def create_transport_data():
 
     distance_miles = 3
 
-    # Get Data ---------------------------------------------------------------------------------------------------------
+    # Train Stations ---------------------------------------------------------------------------------------------------
     train_list = nearby_data.transport_train(postcode, distance_miles)
     station_count = len(train_list)
     nearest_station = train_list[0]
@@ -85,14 +87,16 @@ def create_transport_data():
     destination_trip = googleMapsApi.directions_calc_train(nearest_station_name, "London")
     destination_line = list(destination_trip)[0]
     destination_length = destination_trip[destination_line]
-    # ------------------------------------------------------------------------------------------------------------------
+
+    wiki_info = web_data.station_information(nearest_station_name)
 
     # Creates a paragraph with the data in it
     p_text = '<font size=12>Within a {0} mile radius, {1} is situated around {2} train stations, the closest being ' \
-             '{3} at {4} away. {3} provides transport links straight into London, with the journey only taking {5} ' \
-             'minutes via {6}.</font>'.format(distance_miles, site_name, station_count, nearest_station_name,
-                                              nearest_station_dist, destination_length, destination_line)
-    story.append(Paragraph(p_text, styles["Normal"]))
+             '{3} at {4} away. {5} {3} also provides transport links straight into London, with the journey only ' \
+             'taking {6} minutes via {7}.</font>'.format(distance_miles, site_name, station_count, nearest_station_name,
+                                                         nearest_station_dist, wiki_info,  destination_length,
+                                                         destination_line)
+    story.append(Paragraph(p_text, styles["Justify"]))
     story.append(Spacer(1, 12))
 
     # Generates a table with the data inside it
@@ -100,12 +104,29 @@ def create_transport_data():
     for item in train_list:
         data.append([item[0], str(item[1]) + " miles"])
     t = Table(data)
-    t.setStyle(TableStyle([('BOX', (0, 0), (1, station_count), 2, colors.black),
+    t.setStyle(TableStyle([('BOX', (0, 0), (1, station_count), 1, colors.black),
                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
                            ('BACKGROUND', (0, 0), (1, 0), colors.black),
                            ('TEXTCOLOR', (0, 0), (1, 0), colors.white),
                            ('BACKGROUND', (0, 1), (1, 1), colors.lightgrey)]))
     story.append(t)
+    story.append(Spacer(1, 12))
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # Airports ---------------------------------------------------------------------------------------------------------
+    distance_miles_airport = 60
+    airport_list = nearby_data.transport_airport(postcode, distance_miles_airport)
+    airport_count = len(airport_list)
+    nearest_airport = airport_list[0]
+    nearest_airport_name = nearest_airport[0]
+    nearest_airport_dist = str(nearest_airport[1]) + " miles"
+
+    p_text = "<font size=12>Within a {0} mile radius, {1} is situated around {2} airports, the closest being {3} at " \
+             "{4} away.</font>".format(distance_miles_airport, site_name, airport_count, nearest_airport_name,
+                                       nearest_airport_dist)
+    story.append(Paragraph(p_text, styles["Justify"]))
+    story.append(Spacer(1, 12))
+    # ------------------------------------------------------------------------------------------------------------------
 
 
 def create_title(title_text):

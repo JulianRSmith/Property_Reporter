@@ -40,6 +40,7 @@ def transport(post_code):
     transport_airport(post_code)
 
 
+# Train Information ----------------------------------------------------------------------------------------------------
 def transport_train(post_code, distance):
     print("Trains ---------------------------------")
 
@@ -64,8 +65,10 @@ def transport_train(post_code, distance):
     train_dict = dict(zip(train_station_list, train_distance_list))
     train_dict_sorted = sorted(train_dict.items(), key=itemgetter(1), reverse=False)
     return train_dict_sorted
+# ----------------------------------------------------------------------------------------------------------------------
 
 
+# Bus Information ------------------------------------------------------------------------------------------------------
 def transport_transit(post_code):
     print("Buses ----------------------------------")
     query_result = google_places.nearby_search(
@@ -76,18 +79,37 @@ def transport_transit(post_code):
         location = place.geo_location
         transport_distance = googleMapsApi.distance_calc(post_code, location)
         print(transport_distance)
+# ----------------------------------------------------------------------------------------------------------------------
 
 
-def transport_airport(post_code):
+# Airport Information --------------------------------------------------------------------------------------------------
+def transport_airport(post_code, distance):
     print("Airports -------------------------------")
-    query_result = google_places.nearby_search(
-        location=post_code, name='airport', radius=40000, types=[types.TYPE_AIRPORT], rankby='distance')
+    meters = distance * 1609.344
+    query_result = google_places.nearby_search(location=post_code, name='airport', radius=meters,
+                                               types=[types.TYPE_AIRPORT])
+
+    # List containing the top 25 busiest aiports in the UK
+    largest_airports_list = ["Heathrow", "Gatwick", "Manchester", "Stansted", "Luton", "Edinburgh", "Birmingham",
+                             "Glasgow", "Bristol", "Belfast International", "Newcastle", "Liverpool", "East Midlands",
+                             "London City", "Leeds Bradford", "Aberdeen", "Belfast City", "Southampton", "Jersey",
+                             "Cardiff", "Doncaster Sheffield", "Guernsey", "Southend", "Exeter", "Isle of Man"]
+    airport_name_list = []
+    airport_distance_list = []
 
     for place in query_result.places:
-        print(place.name)
-        location = place.geo_location
-        distance = googleMapsApi.distance_calc(post_code, location)
-        print(distance)
+        if any(airport_name in place.name for airport_name in largest_airports_list):
+            location = place.geo_location
+            airport_distance = googleMapsApi.distance_calc(post_code, location)
+            if airport_distance <= distance:
+                airport_name_list.append(place.name)
+                airport_distance_list.append(airport_distance)
+                print("{0}({1})".format(place.name, str(airport_distance)))
+
+    airport_dict = dict(zip(airport_name_list, airport_distance_list))
+    airport_dict_sorted = sorted(airport_dict.items(), key=itemgetter(1), reverse=False)
+    return airport_dict_sorted
+# ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
 
