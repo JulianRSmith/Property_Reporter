@@ -1,22 +1,27 @@
 from web import web_visit
 import requests
+import re
 from collections import *
 from nearby import googleMapsApi
 
 
-# ------------------------------------------- Train Station Wikipedia Info ---------------------------------------------
-def station_information(station_name):
-    station_name_lower = station_name.replace("Station", "station")
-    station_name = station_name_lower.replace(" ", "_").replace("&", "%26")
+# -------------------------------------------------- Wikipedia Info ----------------------------------------------------
+def wiki_place_extract(place_type, place_name):
+    if place_type == "TRAIN":
+        place_name_fix = place_name.replace("Station", "station")
+    else:
+        place_name_fix = place_name
+    place_name = place_name_fix.replace(" ", "_").replace("&", "%26")
     url = "https://en.wikipedia.org/w/api.php?action=query&generator=search&utf8=1&gsrsearch={0}&prop=extracts" \
-          "&exintro=&explaintext=&format=json".format(station_name)
+          "&exintro=&explaintext=&format=json".format(place_name)
     wiki_api_response = requests.get(url)
     wiki_dict = wiki_api_response.json()
     text_summary = wiki_dict['query']['pages']
     for item in text_summary:
         match = text_summary[item]['title']
-        if match == station_name_lower:
+        if match == place_name_fix:
             extract = text_summary[item]['extract']
+            extract = re.sub("[(\[].*?[)\]]", "", extract)
             return extract
     return ""
 # ----------------------------------------------------------------------------------------------------------------------
@@ -84,6 +89,6 @@ def crime_performance(force_name, force_id):
     print(table_dict)
 
 
-# station_information("Chalfont & Latimer Station")
+# wiki_place_extract("Chalfont & Latimer Station")
 # crime("HP6 6SW")
 # ----------------------------------------------------------------------------------------------------------------------

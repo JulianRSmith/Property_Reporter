@@ -90,15 +90,15 @@ def transport_airport(post_code, distance):
                                                types=[types.TYPE_AIRPORT])
 
     # List containing the top 25 busiest aiports in the UK
-    largest_airports_list = ["Heathrow", "Gatwick", "Manchester", "Stansted", "Luton", "Edinburgh", "Birmingham",
+    largest_airports_list = ["Heathrow Airport", "Gatwick", "Manchester", "Stansted", "London Luton Airport", "Edinburgh", "Birmingham",
                              "Glasgow", "Bristol", "Belfast International", "Newcastle", "Liverpool", "East Midlands",
-                             "London City", "Leeds Bradford", "Aberdeen", "Belfast City", "Southampton", "Jersey",
+                             "London City Airport", "Leeds Bradford", "Aberdeen", "Belfast City", "Southampton", "Jersey",
                              "Cardiff", "Doncaster Sheffield", "Guernsey", "Southend", "Exeter", "Isle of Man"]
     airport_name_list = []
     airport_distance_list = []
 
     for place in query_result.places:
-        if any(airport_name in place.name for airport_name in largest_airports_list):
+        if place.name in largest_airports_list:
             location = place.geo_location
             airport_distance = googleMapsApi.distance_calc(post_code, location)
             if airport_distance <= distance:
